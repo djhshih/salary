@@ -14,8 +14,8 @@ data {
 }
 
 parameters {
-	real theta[G];   // gender effect (compared to female)
-	real phi[H];     // ethnicity effect
+	real theta[G-1];   // gender effect (compared to female)
+	real phi[H-1];     // ethnicity effect
 
 	real beta[D];             // department-specific salary log base
 	// ideally, these would have size J
@@ -23,7 +23,7 @@ parameters {
 	real<lower=0> nu[J];      // job-specific salary log raise
 
 	real<lower=0> sigma;      // inter-individual variability
-	real<lower=0> tau_mu;     // inter-department variability for mu
+	real<lower=0> tau_mu;     // inter-job variability within department
 
 	// augmented variables
 	real eta_mu[J];
@@ -44,13 +44,15 @@ transformed parameters {
 
 		mu[jj] = beta[dd] + tau_mu*eta_mu[jj];
 
-		z[i] = mu[jj] + nu[jj]*t[i] + theta[g[i]] + phi[h[i]];
+		z[i] = mu[jj] + nu[jj]*t[i] + 
+			(g[i] == 1 ? 0 : theta[g[i]-1]) +
+			(h[i] == 1 ? 0 : phi[h[i]-1]);
 	}
 }
 
 model {
-	theta	~ normal(0, 10);
-	phi ~ normal(0, 10);
+	theta	~ normal(0, 1);
+	phi ~ normal(0, 1);
 	nu ~ normal(0, 0.1);
 
 	eta_mu ~ normal(0, 1);
