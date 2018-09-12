@@ -21,7 +21,7 @@ d$gender <- relevel(d$gender, "Female");
 #d$gender <- relevel(d$gender, "Male");
 table(d$gender)
 
-d.f <- filter(d, complete.cases(d));
+d.f <- filter(d, employment_percent > 0, complete.cases(d));
 d.f <- droplevels(d.f);
 
 x <- with(d.f,
